@@ -6,10 +6,10 @@
         <field name="state">code</field>
         <field name="use_in_ai" eval="True"/>
         <field name="ai_tool_allow_end_message" eval="False"/>
-        <field name="code">ai['result'] = record.sudo()._ai_create_quotation(partner_id, product_ids, product_quantities)</field>
+        <field name="code">ai['result'] = record.sudo()._ai_create_quotation(partner_id, products)</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="ai_tool_description">## Tool: Create Quotation
-Use after you have called "Get Quotation Parameters" and obtained the partner_id and product_ids.
+Use after you have called "Get Quotation Parameters" and obtained the partner_id, product_ids and product_quantities.
 Pass the IDs from that tool along with the quantities extracted from the customer's message.
         </field>
         <field name="ai_tool_schema">
@@ -19,22 +19,12 @@ Pass the IDs from that tool along with the quantities extracted from the custome
                     "type": "number",
                     "description": "ID of the partner (customer) for which the quotation is created"
                 },
-                "product_ids": {
-                    "type": "array",
-                    "description": "Array of product IDs for the quotation. Each product ID corresponds to the quantity at the same index in product_quantities",
-                    "items": {
-                        "type": "number"
-                    }
-                },
-                "product_quantities": {
-                    "type": "array",
-                    "description": "Array of product quantities for the quotation. Each quantity corresponds to the product ID at the same index in product_ids",
-                    "items": {
-                        "type": "number"
-                    }
+                "products":{
+                    "type": "string",
+                    "description": "JSON string of products for the quotation. Each product is a JSON object with the following properties: {id: product ID, quantity: product quantity}"
                 }
             },
-            "required": ["partner_id", "product_ids", "product_quantities"],
+            "required": ["partner_id", "products"],
             "type": "object"
         }
         </field>

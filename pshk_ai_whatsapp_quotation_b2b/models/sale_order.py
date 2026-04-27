@@ -44,16 +44,17 @@ class SaleOrder(models.Model):
         return response
     
     @api.model
-    def _ai_create_quotation(self, partner_id, product_ids, product_quantities):
+    def _ai_create_quotation(self, partner_id, products):
         # Create the quotation
-        order = self.create(self._ai_prepare_quotation_creation_values(partner_id, product_ids, product_quantities))
+        products = json.loads(products)
+        order = self.create(self._ai_prepare_quotation_creation_values(partner_id, products))
         return f"Quotation created. Quotation ID: {order.id}"
     
     @api.model
-    def _ai_prepare_quotation_creation_values(self, partner_id, product_ids, product_quantities):
+    def _ai_prepare_quotation_creation_values(self, partner_id, products):
         # Prepare the order line values
-        order_line_vals = [(0, 0, {'product_id': product_id, 'product_uom_qty': qty}) 
-                          for product_id, qty in zip(product_ids, product_quantities)]
+        order_line_vals = [(0, 0, {'product_id': product['id'], 'product_uom_qty': product['quantity']}) 
+                          for product in products]
         return [{
             'partner_id': partner_id,
             'user_id': self.env.ref('pshk_ai_whatsapp_quotation_b2b.user_x_whatsapp_ai_bot').id,
