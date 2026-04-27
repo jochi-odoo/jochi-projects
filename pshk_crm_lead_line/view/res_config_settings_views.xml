@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_config_settings_form_inherit" model="ir.ui.view">
+        <field name="name">view.res.config.settings.form.inherit</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="crm.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='partnership_settings']" position="after">
+                <setting id="x_use_crm_lead_line" help="Track products in CRM opportunities and transfer directly to sales order">
+                    <field name="x_use_crm_lead_line"/>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

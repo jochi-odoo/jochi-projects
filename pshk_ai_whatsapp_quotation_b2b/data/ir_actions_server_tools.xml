@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="ir_actions_server_x_ai_create_quotation" model="ir.actions.server">
+        <field name="name">AI WhatsApp Sales: Create Quotation</field>
+        <field name="state">code</field>
+        <field name="use_in_ai" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="False"/>
+        <field name="code">ai['result'] = record.sudo()._ai_create_quotation(partner_id, product_ids, product_quantities)</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ai_tool_description">## Tool: Create Quotation
+Use after you have called "Get Quotation Parameters" and obtained the partner_id and product_ids.
+Pass the IDs from that tool along with the quantities extracted from the customer's message.
+        </field>
+        <field name="ai_tool_schema">
+        {
+            "properties": {
+                "partner_id": {
+                    "type": "number",
+                    "description": "ID of the partner (customer) for which the quotation is created"
+                },
+                "product_ids": {
+                    "type": "array",
+                    "description": "Array of product IDs for the quotation. Each product ID corresponds to the quantity at the same index in product_quantities",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "product_quantities": {
+                    "type": "array",
+                    "description": "Array of product quantities for the quotation. Each quantity corresponds to the product ID at the same index in product_ids",
+                    "items": {
+                        "type": "number"
+                    }
+                }
+            },
+            "required": ["partner_id", "product_ids", "product_quantities"],
+            "type": "object"
+        }
+        </field>
+    </record>
+
+    <record id="ir_actions_server_x_send_inform_message" model="ir.actions.server">
+        <field name="name">AI WhatsApp Sales: Send Inform Message</field>
+        <field name="state">code</field>
+        <field name="use_in_ai" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="True"/>
+        <field name="code">ai['result'] = record.sudo()._ai_send_inform_message(order_id, message_id)</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ai_tool_description">## Tool: Send Inform Message
+After you have called the "Create quotation" tool, send an inform message to the customer if the quotation creation was successful.
+Send an inform message to the customer with the quotation number.
+        </field>
+        <field name="ai_tool_schema">
+        {
+            "properties": {
+                "order_id": {
+                    "type": "number",
+                    "description": "ID of the created quotation"
+                },
+                "message_id": {
+                    "type": "number",
+                    "description": "ID of the message from the customer"
+                }
+            },
+            "required": ["order_id", "message_id"],
+            "type": "object"
+        }
+        </field>
+    </record>
+
+    <record id="ir_actions_server_x_ai_product_search" model="ir.actions.server">
+        <field name="name">AI WhatsApp Sales: Product Search</field>
+        <field name="state">code</field>
+        <field name="use_in_ai" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="False"/>
+        <field name="code">ai['result'] = record.sudo()._ai_product_search(product_name)</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ai_tool_description">## Tool: Product Search
+Search for products based on the product name to get the product ID.
+Use this tool only when you need to know the product ID for a product.
+        </field>
+        <field name="ai_tool_schema">
+        {
+            "properties": {
+                "product_name": {
+                    "type": "string",
+                    "description": "Name of the product to search for"
+                }
+            },
+            "required": ["product_name"],
+            "type": "object"
+        }
+        </field>
+    </record>
+
+    <record id="ir_actions_server_x_ai_partner_search" model="ir.actions.server">
+        <field name="name">AI WhatsApp Sales: Partner Search</field>
+        <field name="state">code</field>
+        <field name="use_in_ai" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="False"/>
+        <field name="code">ai['result'] = record.sudo()._ai_partner_search(partner_name)</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ai_tool_description">## Tool: Partner Search
+Search for partners based on the partner name to get the partner ID.
+Use this tool only when you need to know the partner ID for a partner.
+        </field>
+        <field name="ai_tool_schema">
+        {
+            "properties": {
+                "partner_name": {
+                    "type": "string",
+                    "description": "Name of the partner to search for"
+                }
+            },
+            "required": ["partner_name"],
+            "type": "object"
+        }
+        </field>
+    </record>
+</odoo>

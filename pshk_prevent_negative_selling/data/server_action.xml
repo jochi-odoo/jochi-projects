@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="action_prevent_negative_selling" model="ir.actions.server">
+        <field name="name">Prevent negative selling</field>
+        <field name="model_id" ref="stock.model_stock_picking"/> 
+        <field name="state">code</field>
+        <field name="code">
+<![CDATA[
+on_hand_tracking = {}
+for record in records:
+    adjusted_products = []
+    all_zero = True
+    if record.state == 'draft':
+        record.action_confirm() # To merge moves
+    if record.picking_type_id.x_prevent_negative_selling:
+        for move_line in record.move_line_ids:
+            # Get the available quantity
+            on_hand_quantity = move_line.product_id.with_context(location=move_line.location_id.id, lot_id=move_line.lot_id.id).qty_available
+            key = (move_line.product_id.id, move_line.location_id.id, move_line.lot_id.id)
+            if key not in on_hand_tracking:
+                on_hand_tracking[key] = on_hand_quantity
+            
+            # Adjust the delivering quantity to the available quantity to enable backorder
+            if move_line.quantity > on_hand_tracking[key]:
+                original_qty = move_line.quantity
+                # Adjust to available (0 if nothing available)
+                new_qty = max(0, on_hand_tracking[key])
+                move_line['quantity'] = new_qty
+                adjusted_products.append("%s: %s → %s" % (move_line.product_id.display_name, original_qty, new_qty))
+            
+            on_hand_tracking[key] -= move_line.quantity
+
+            all_zero = all_zero and move_line.quantity == 0 # check if any partial delivery
+        if all_zero:
+            raise UserError("You cannot transfer more than on-hand quantities.")
+
+        # Show notification to user
+        if adjusted_products:
+            message = "Insufficient stock detected. Quantities adjusted:\n" + "\n".join(adjusted_products)
+            record.message_post(body=message, message_type='notification')
+
+res = records.button_validate()
+if isinstance(res, dict):
+    action = res
+]]>
+        </field>
+    </record>
+
+    <record id="stock.action_validate_picking" model="ir.actions.server">
+        <field name="name">Validate</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="binding_model_id" ref="stock.model_stock_picking"/>
+        <field name="code">
+<![CDATA[
+action = env.ref('pshk_prevent_negative_selling.action_prevent_negative_selling').run()
+]]>
+        </field>
+    </record>
+</odoo>

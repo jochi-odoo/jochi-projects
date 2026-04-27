@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="crm_lead_view_form_inherit_pshk_crm_lead_line" model="ir.ui.view">
+        <field name="name">crm.lead.view.form.inherit.pshk_crm_lead_line</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='lead_priority']/.." position="after">
+                <group invisible="not x_use_crm_lead_line or type != 'opportunity'">
+                    <field name="x_crm_lead_line_ids" colspan="2">
+                        <list editable="bottom">
+                            <field name="x_product_id"/>
+                            <field name="x_quantity"/>
+                            <field name="x_uom_id"/>
+                            <field name="x_price_unit"/>
+                        </list>
+                    </field>
+                </group>
+            </xpath>
+
+            <xpath expr="//button[@name='action_sale_quotations_new']" position="attributes">
+                <attribute name="name">%(pshk_crm_lead_line.action_new_quotation_with_crm_lead_line)d</attribute>
+                <attribute name="type">action</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

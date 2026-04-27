@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="model_x_external_reference" model="ir.model">
+            <field name="name">External Reference</field>
+            <field name="model">x_external_reference</field>
+            <field name="state">manual</field>
+        </record>
+
+        <record id="field_external_reference__x_ext_ref_product_id" model="ir.model.fields">
+            <field name="name">x_ext_ref_product_id</field>
+            <field name="field_description">External reference product</field>
+            <field name="model_id" ref="model_x_external_reference"/>
+            <field name="ttype">many2one</field>
+            <field name="relation">product.template</field>
+        </record>
+
+        <record id="field_external_reference__x_ext_ref_partner_id" model="ir.model.fields">
+            <field name="name">x_ext_ref_partner_id</field>
+            <field name="field_description">External reference partner</field>
+            <field name="model_id" ref="model_x_external_reference"/>
+            <field name="ttype">many2one</field>
+            <field name="relation">res.partner</field>
+        </record>
+
+        <record id="field_external_reference__x_name" model="ir.model.fields">
+            <field name="name">x_name</field>
+            <field name="field_description">External reference</field>
+            <field name="model_id" ref="model_x_external_reference"/>
+            <field name="ttype">char</field>
+        </record>
+    </data>
+</odoo>

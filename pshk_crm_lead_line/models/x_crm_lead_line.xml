@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="model_x_crm_lead_line" model="ir.model">
+            <field name="name">CRM Lead Line</field>
+            <field name="model">x_crm_lead_line</field>
+            <field name="state">manual</field>
+        </record>
+
+        <record id="field_x_crm_lead_line__x_lead_id" model="ir.model.fields">
+            <field name="name">x_lead_id</field>
+            <field name="field_description">Lead</field>
+            <field name="model_id" ref="model_x_crm_lead_line"/>
+            <field name="ttype">many2one</field>
+            <field name="relation">crm.lead</field>
+        </record>
+
+        <record id="field_x_crm_lead_line__x_product_id" model="ir.model.fields">
+            <field name="name">x_product_id</field>
+            <field name="field_description">Product</field>
+            <field name="model_id" ref="model_x_crm_lead_line"/>
+            <field name="ttype">many2one</field>
+            <field name="relation">product.product</field>
+            <field name="required">True</field>
+            <field name="on_delete">cascade</field>
+        </record>
+
+        <record id="field_x_crm_lead_line__x_quantity" model="ir.model.fields">
+            <field name="name">x_quantity</field>
+            <field name="field_description">Quantity</field>
+            <field name="model_id" ref="model_x_crm_lead_line"/>
+            <field name="ttype">float</field>
+            <field name="required">True</field>
+        </record>
+
+        <record id="field_x_crm_lead_line__x_uom_id" model="ir.model.fields">
+            <field name="name">x_uom_id</field>
+            <field name="field_description">UoM</field>
+            <field name="model_id" ref="model_x_crm_lead_line"/>
+            <field name="ttype">many2one</field>
+            <field name="relation">uom.uom</field>
+            <field name="related">x_product_id.uom_id</field>
+            <field name="required">True</field>
+            <field name="on_delete">cascade</field>
+        </record>
+
+        <record id="field_x_crm_lead_line__x_price_unit" model="ir.model.fields">
+            <field name="name">x_price_unit</field>
+            <field name="field_description">Unit Price</field>
+            <field name="model_id" ref="model_x_crm_lead_line"/>
+            <field name="ttype">float</field>
+            <field name="compute">
+for record in self:
+    record['x_price_unit'] = record['x_product_id'].list_price
+            </field>
+            <field name="depends">x_product_id</field>
+            <field name="store">True</field>
+            <field name="required">True</field>
+        </record>
+    </data>
+</odoo>

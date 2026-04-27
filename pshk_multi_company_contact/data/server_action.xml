@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_sync_company_id" model="ir.actions.server">
+        <field name="name">Sync company_id from x_company_ids</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="group_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="state">code</field>
+        <field name="code">
+<![CDATA[
+if record.x_company_ids and record.company_id != record.x_company_ids[0].id:
+    record['company_id'] = record.x_company_ids[0].id
+else:
+    record['company_id'] = False
+]]>
+        </field>
+    </record>
+    
+</odoo>

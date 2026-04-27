@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="user_x_whatsapp_ai_bot" model="res.users">
+            <field name="name">WhatsApp AI Bot</field>
+            <field name="login">whatsapp-ai-bot</field>
+            <field name="email">whatsapp-ai-bot@internal</field>
+            <field name="group_ids" eval="[
+                Command.set([
+                    ref('sales_team.group_sale_salesman')
+                ])
+            ]"/>
+        </record>
+    </data>
+</odoo>

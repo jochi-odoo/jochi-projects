@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_config_settings_form_inherit" model="ir.ui.view">
+        <field name="name">view.res.config.settings.form.inherit</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="stock_account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='group_lot_on_invoice']" position="after">
+                <setting id="x_combine_lots_sn_picking_report" help="Lots and Serial Numbers will be displayed individually in the invoice lines.">
+                    <field name="x_combine_lots_sn_picking_report"/>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

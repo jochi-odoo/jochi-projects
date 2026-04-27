@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="field_sale_order_line_x_external_reference_id" model="ir.model.fields">
+        <field name="name">x_external_reference_id</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="field_description">External Reference</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">x_external_reference</field>
+        <field name="compute">
+for record in self:
+    if record.product_id and record.order_partner_id:
+        ref_record = self.env['x_external_reference'].search([
+            ('x_ext_ref_product_id', '=', record.product_id.product_tmpl_id.id),
+            ('x_ext_ref_partner_id', '=', record.order_partner_id.commercial_partner_id.id)
+        ], limit=1)
+        record['x_external_reference_id'] = ref_record.id
+        </field>
+        <field name="depends">product_id,order_partner_id</field>
+        <field name="store">True</field>
+    </record>
+</odoo>

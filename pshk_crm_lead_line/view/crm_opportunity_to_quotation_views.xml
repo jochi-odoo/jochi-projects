@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crm_quotation_partner_view_form_inherit_pshk_crm_lead_line" model="ir.ui.view">
+        <field name="name">crm.quotation.partner.view.form.inherit.pshk_crm_lead_line</field>
+        <field name="model">crm.quotation.partner</field>
+        <field name="inherit_id" ref="sale_crm.crm_quotation_partner_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_apply']" position="attributes">
+                <attribute name="name">%(pshk_crm_lead_line.action_new_quotation_wizard)d</attribute>
+                <attribute name="type">action</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

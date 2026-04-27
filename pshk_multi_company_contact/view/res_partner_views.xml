@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_partner_form_inherit" model="ir.ui.view">
+        <field name="name">view.res.partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='misc']" position="inside">
+                <field name="x_company_ids" groups="base.group_multi_company" widget="many2many_tags" string="Companies Visibility" options="{'no_create': True}" readonly="parent_id" force_save="1" placeholder="Visible to all"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

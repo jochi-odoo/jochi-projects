@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="ai_agent_x_whatsapp_quotation_b2b" model="ai.agent">
+        <field name="name">WhatsApp Quotation B2B</field>
+        <field name="subtitle">Used for generating quotations from WhatsApp messages.</field>
+        <field name="llm_model">gpt-4o</field>
+        <field name="topic_ids" eval="[(6, 0, [ref('ai_topic_x_create_quotation')])]"/>
+        <field name="create_uid" ref="base.user_admin"/>
+    </record>
+
+</odoo>

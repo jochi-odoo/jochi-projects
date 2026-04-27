@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="automation_sync_company_id" model="base.automation">
+        <field name="name">Partner: sync company_id from x_company_ids</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="trigger">on_change</field>
+        <field name="filter_pre_domain">[]</field>
+        <field name="on_change_field_ids" eval="[(4, ref('field_res_partner__x_company_ids'))]"/>
+        <field name="action_server_ids" eval="[(4, ref('pshk_multi_company_contact.action_sync_company_id'))]"/>
+    </record>
+
+</odoo>
