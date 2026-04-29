@@ -25,10 +25,11 @@ The order line format can be slightly different, but must include product name a
 1. A **scheduled action** runs every hour and fetches all inbound WhatsApp messages received since the last run.
 2. The messages are passed as a batch prompt to the **AI agent** (`WhatsApp Quotation B2B`).
 3. The agent identifies which messages are quotation messages (ignoring greetings, unrelated messages, etc.).
-4. For each identified order, the agent:
-   - Calls **Get Information** to retrieve the list of partners and products with their IDs (called once per batch).
-   - Calls **Create Quotation** with the resolved `partner_id`, `product_ids`, and quantities.
-   - Calls **Send Inform Message** to reply to the customer's WhatsApp thread with the created order number.
+4. For each identified quotation message, the agent:
+   - Calls `_ai_parten_search` to search the database for the top 3 matching partners, and retrieve their ID.
+   - Calls `_ai_product_search` to search the database for the top 3 matching products for each product line in the quotation message, and retrieve their IDs. If any product is not found in the database, the quotation creation will be marked as failed.
+   - Calls `create_quotation_from_whatsapp` to create the quotation if the partner and all products are found. 
+   - Calls `_send_inform_message` to inform the customer about the quotation creation result. If success, we inform the customer the created quotation number. If failed, an error message is sent instead.
 
 ## Components
 
@@ -46,9 +47,10 @@ The order line format can be slightly different, but must include product name a
 
 | Tool | Description |
 |---|---|
-| **Get Information** | Fetches all partners and products from the database with their IDs. Called once per batch. |
+| **Partner Search** | Search the partner in the database. Use `difflib` to find the top 3 matching partners and return their names and IDs.  |
+| **Product Search** | Search the product in the database. Use `difflib` to find the top 3 matching products and return their names and IDs.  |
 | **Create Quotation** | Creates a `sale.order` record with the resolved partner and product IDs. |
-| **Send Inform Message** | Posts a WhatsApp reply in the customer's channel with the created order name. |
+| **Send Inform Message** | Posts a WhatsApp reply in the customer's channel with the created order name if the quotation is successfully created. Reply to the message with an error message if the quotation failed to be created.|
 
 ### Bot User
 A dedicated internal user (`WhatsApp AI Bot`) is created and assigned as the salesperson on all quotations created by this module.

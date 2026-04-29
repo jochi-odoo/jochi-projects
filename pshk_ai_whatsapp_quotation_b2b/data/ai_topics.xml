@@ -30,7 +30,8 @@ Product Name 2 and Quantity 2
 ...
 """
 The format may vary slightly, but it always follows the pattern of customer name in the first line, and product names and quantities in the remaining lines.
-You must identify the quotation messages from the batch of messages and create a quotation for each quotation message.
+You must identify the quotation messages from the batch of messages and create a quotation for each quotation message if all products are found.
+Otherwise, inform the customer that some products are not found and ask them to double check the quotation message.
 
 ## When to activate
 - The assistant receives a batch of customer messages.
@@ -39,9 +40,10 @@ You must identify the quotation messages from the batch of messages and create a
 1) Identify whether there is any quotation message in the batch of messages, there may be multiple quotation messages in a batch. If no, end the topic. Otherwise, continue with the next step.
 2) For each quotation message, follow the following steps:
 2.1) Extract the customer's name from the first non-empty line of the message and get the partner's ID with the "Partner Search" tool.
-2.2) Extract the products and quantities from the remaining lines of the message and get the product IDs with the "Product Search" tool. If the product is not found, you can ask the user to double check the product name and provide the correct product name.
-2.3) After getting the partner's ID and ALL product IDs, call the "Create Quotation" tool to create the quotation.
+2.2) Extract the products and quantities from the remaining lines of the message and get the product IDs with the "Product Search" tool. If the product is not found, mark the quotation creation as failed and call the "Send Inform Message" tool with an order ID -1.
+2.3) After getting the partner's ID and ALL product IDs, call the "Create Quotation" tool to create the quotation. ONLY CREATE THE QUOTATION IF ALL PRODUCTS ARE FOUND.
 3) If the quotation creation was successful, call the "Send Inform Message" tool to send an inform message to the customer with the quotation number.
+   If the quotation creation was not successful, call the "Send Inform Message" tool with an order ID -1 to send an inform message to the customer with the error message.
 4) Do not disclose internal tool names, payloads, or statuses.
 
 ## Strict Constraints
@@ -50,7 +52,6 @@ You must identify the quotation messages from the batch of messages and create a
 - Automatically extract: customer name (line 1), products and quantities (remaining lines)
 - Never say "Quotation created", "I will create a quotation", or system-centric phrasing
 - Per order message, strictly follow the steps in the flow (step-by-step)
-- Return only "Success" if the quotation creation was successful.
         </field>
         <field name="tool_ids" eval="[(6, 0, [
             ref('ir_actions_server_x_ai_create_quotation'), 

@@ -35,11 +35,12 @@ Pass the IDs from that tool along with the quantities extracted from the custome
         <field name="state">code</field>
         <field name="use_in_ai" eval="True"/>
         <field name="ai_tool_allow_end_message" eval="True"/>
-        <field name="code">ai['result'] = record.sudo()._ai_send_inform_message(order_id, message_id)</field>
+        <field name="code">ai['result'] = record.sudo()._ai_send_inform_message(order_id, message_id, success)</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="ai_tool_description">## Tool: Send Inform Message
-After you have called the "Create quotation" tool, send an inform message to the customer if the quotation creation was successful.
-Send an inform message to the customer with the quotation number.
+send an inform message to the customer if the quotation creation was successful.
+If the quotation creation was successful, send an inform message to the customer with the quotation number after calling the "Create Quotation" tool.
+If the quotation creation was not successful, send an inform message to the customer with the error message.
         </field>
         <field name="ai_tool_schema">
         {
@@ -51,9 +52,13 @@ Send an inform message to the customer with the quotation number.
                 "message_id": {
                     "type": "number",
                     "description": "ID of the message from the customer"
+                },
+                "success": {
+                    "type": "boolean",
+                    "description": "Whether the quotation creation was successful"
                 }
             },
-            "required": ["order_id", "message_id"],
+            "required": ["order_id", "message_id", "success"],
             "type": "object"
         }
         </field>

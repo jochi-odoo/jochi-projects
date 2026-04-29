@@ -64,16 +64,22 @@ class SaleOrder(models.Model):
         }]
     
     @api.model
-    def _ai_send_inform_message(self, order_id, message_id):
+    def _ai_send_inform_message(self, order_id, message_id, success):
         # Reply to the customer's order message with the quotation number
-        order = self.browse(order_id)
         message = self.env['whatsapp.message'].browse(message_id)
         if message.mail_message_id.model == 'discuss.channel':
             channel = self.env['discuss.channel'].browse(message.mail_message_id.res_id)
-            channel.message_post(body=f"🤖 Your quotation has been created. Quotation ID: {order.name}.",
-                                 message_type='whatsapp_message',
-                                 subtype_xmlid='mail.mt_comment',
-                                 parent_id=message.mail_message_id.id)
+            if success:
+                order = self.browse(order_id)
+                channel.message_post(body=f"🤖 Your quotation has been created. Quotation ID: {order.name}.",
+                                        message_type='whatsapp_message',
+                                        subtype_xmlid='mail.mt_comment',
+                                        parent_id=message.mail_message_id.id)
+            else:
+                channel.message_post(body=f"⚠️ Your quotation has not been created. Please check the products and quantities and try again, or contact us for assistance.",
+                                     message_type='whatsapp_message',
+                                     subtype_xmlid='mail.mt_comment',
+                                     parent_id=message.mail_message_id.id)
         return "Success"
     
     def create_quotation_from_whatsapp(self):
