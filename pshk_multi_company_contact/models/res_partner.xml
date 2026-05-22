@@ -7,9 +7,7 @@
         <field name="ttype">many2many</field>
         <field name="relation">res.company</field>
         <field name="compute">
-for record in self:
-    if record['company_id'] and record['company_id'] not in record['x_company_ids']:
-        record['x_company_ids'] = [record['company_id'].id, *record['x_company_ids'].ids]
+
         </field>
         <field name="depends">company_id</field>
         <field name="store">True</field>

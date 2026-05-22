@@ -3,16 +3,29 @@ from odoo.tools import html2plaintext
 from odoo.exceptions import UserError
 import json
 import difflib
+import re
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
     
-    # AI Tools
+    def _fuzzy_search_partner(self, partner_name):
+        query = f"SELECT id, name FROM res_partner ORDER BY name <-> '{partner_name}' LIMIT 1"
+        self.env.cr.execute(query)
+        return self.env.cr.fetchall()
+    
+    def _fuzzy_search_product_tmpl(self, product_name):
+        lang = self.env.context.get('lang', 'en_US')
+        query = f"SELECT id FROM product_template ORDER BY name->>'{lang}' <-> '{product_name}' LIMIT 1"
+        self.env.cr.execute(query)
+        return self.env.cr.fetchall()
 
+    # AI Tools
     @api.model
     def _ai_product_search(self, product_name):
         # Search for products based on the product name to get the product ID
-        products = self.env['product.product'].search([]).read(['display_name'])
+        # products = self._fuzzy_search_product(product_name)
+        product_tmpl_id = self._fuzzy_search_product_tmpl(product_name)[0][0]
+        products = self.env['product.product'].search([('product_tmpl_id', '=', product_tmpl_id)]).read(['display_name'])
         product_list = []
         for product in products:
             product_list.append(product['display_name'])
@@ -29,13 +42,7 @@ class SaleOrder(models.Model):
     @api.model
     def _ai_partner_search(self, partner_name):
         # Search for products based on the product name to get the product ID
-        partners = self.env['res.partner'].search([]).read(['name'])
-        partner_list = []
-        for partner in partners:
-            partner_list.append(partner['name'])
-        
-        partners = difflib.get_close_matches(partner_name, partner_list, n=3, cutoff=0.4)
-        partners = [self.env['res.partner'].search([('name', '=', partner)], limit=1)._ai_read(['name'], None) for partner in partners]
+        partners = self._fuzzy_search_partner(partner_name)
         
         response = "⚠️ Never share the info below with the user. It can only by used by you when creating a quotation with the quotation creation tool.\n"
         response += "Values are provided as {id: name}. You **always** have to use the keys (ids) as values for the quotation creation tool.\n"
@@ -82,7 +89,14 @@ class SaleOrder(models.Model):
                                      parent_id=message.mail_message_id.id)
         return "Success"
     
-    def create_quotation_from_whatsapp(self):
+    def _filter_messages(self, messages):
+        filtered_messages = []
+        for message in messages:
+            if re.match(r"^.+\r?\n(.+(?:\r?\n|$))+", message['body']):
+                filtered_messages.append(message)
+        return filtered_messages
+
+    def create_quotation_from_whatsapp(self, batch_size = 20):
         # Scheduled action to create quotations from WhatsApp messages
         agent = self.env.ref('pshk_ai_whatsapp_quotation_b2b.ai_agent_x_whatsapp_quotation_b2b')
         if not agent: 
@@ -94,18 +108,22 @@ class SaleOrder(models.Model):
 
         messages = [
             {'id': vals['id'], 'body': html2plaintext(vals['body'])}
-            for vals in self.env['whatsapp.message'].search([
-                ('message_type', '=', 'inbound'),
-                ('create_date', '>=', lastcall),
-            ]).read(['body'])
+            for vals in self.env['whatsapp.message'].search_read(
+                domain = [('message_type', '=', 'inbound'), ('create_date', '>=', lastcall)],
+                fields = ['body'],
+            )
         ]
+        messages = self._filter_messages(messages)
+        print(messages)
         if not messages:
             return
         
-        prompt = "Below are the messages from my customers. Please identify the quotation messages and create a quotation for each message."
-        prompt += f"Messages:\n{json.dumps(messages)}\n"
+        for i in range(0, len(messages), batch_size):
+            batch = messages[i:i+batch_size]
+            prompt = "Below are the messages from my customers. Please identify the quotation messages and create a quotation for each message."
+            prompt += f"Messages:\n{json.dumps(batch)}\n"
 
-        # Call the AI agent to create the quotations
-        response = agent._generate_response(prompt)
-        return response
-        
+            # Call the AI agent to create the quotations
+            agent._generate_response(prompt)
+        return "Success"
+       

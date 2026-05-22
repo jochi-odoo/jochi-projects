@@ -8,12 +8,46 @@
         <field name="state">code</field>
         <field name="code">
 <![CDATA[
-if record.x_company_ids and record.company_id != record.x_company_ids[0].id:
-    record['company_id'] = record.x_company_ids[0].id
-else:
-    record['company_id'] = False
+record['company_id'] = record.x_company_ids[:1].id if record.x_company_ids[:1] else False
+]]>
+        </field>
+    </record>
+
+    <record id="action_sync_active_company_id" model="ir.actions.server">
+        <field name="name">Sync active company id to company_id</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="group_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="state">code</field>
+        <field name="code">
+<![CDATA[
+partners = env['res.partner'].search([])
+for partner in partners:
+    if env.company.id in partner.x_company_ids:
+        partner['company_id'] = env.company.id
 ]]>
         </field>
     </record>
     
+    <record id="action_activate_company" model="ir.actions.server">
+        <field name="name">Activate company</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="group_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="state">code</field>
+        <field name="code">
+<![CDATA[
+
+]]>
+        </field>
+    </record>
+
+    <record id="action_remove_company_id" model="ir.actions.server">
+        <field name="name">Remove company_id</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="group_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="state">code</field>
+        <field name="code">
+<![CDATA[
+]]>
+        </field>
+    </record>
 </odoo>

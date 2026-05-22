@@ -2,15 +2,32 @@
 <odoo>
 
     <data>
+
         <record id="base.res_partner_rule" model="ir.rule">
             <field name="active" eval="False"/>
         </record>
 
-        <record id="res_partner_multi_company_contact" model="ir.rule">
-            <field name="name">res.partner: multi company</field>
+        <record id="res_partner_multi_company_contact_read" model="ir.rule">
+            <field name="name">res.partner: multi company read</field>
             <field name="model_id" ref="base.model_res_partner"/>
             <field name="groups" eval="[Command.link(ref('base.group_user'))]"/>
-            <field name="domain_force">['|', '|', ('partner_share', '=', False), ('x_company_ids', 'parent_of', company_ids), ('x_company_ids', '=', False)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="domain_force">['|', '|', ('partner_share', '=', False), ('x_company_ids', 'in', company_ids), ('x_company_ids', '=', False)]</field>
+        </record>
+        <!-- 2. WRITE/CREATE RULE: Users can save if the company is in their ALLOWED companies (even if not active) -->
+        <record id="res_partner_multi_company_contact_write" model="ir.rule">
+            <field name="name">res.partner: multi company write</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="groups" eval="[Command.link(ref('base.group_user'))]"/>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <!-- We use user.company_ids.ids here to check against all companies assigned to the user profile -->
+            <field name="domain_force">['|', '|', ('partner_share', '=', False), ('x_company_ids', 'in', user.company_ids.ids), ('x_company_ids', '=', False)]</field>
         </record>
     </data>
 
