@@ -35,6 +35,6 @@
         <field name="view_mode">list,form</field>
     </record>
 
-    <menuitem id="menu_external_reference" name="External Reference" parent="sale.sale_menu_root" action="x_external_reference_action" sequence="99"/>
+    <menuitem id="menu_external_reference" name="External Reference" parent="sale.sale_menu_root" action="x_external_reference_action" sequence="99" groups="sales_team.group_sale_salesman"/>
 
 </odoo>

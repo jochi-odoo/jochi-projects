@@ -8,15 +8,11 @@
     'license': 'LGPL-3',
     'category': 'Contacts',
     'depends': [
-        'base_automation',
         'contacts'
     ],
     'data': [
-        'models/res_partner.xml',
         'view/res_partner_views.xml',
-        'security/ir.rule.xml',
-        'data/server_action.xml',
-        'data/base_automation.xml',
+        'security/ir.rule.xml'
     ],
     'task_id': [6019883],
 }
